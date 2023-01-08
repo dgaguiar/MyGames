@@ -26,8 +26,8 @@ class GameTableViewCell: UITableViewCell {
     }
     
     func prepare(with game: Game) {
-        lbTitle.text = game.title ?? String()
-        lbConsole.text = game.console?.name ?? String()
+        lbTitle.text = game.title ?? "nome indisponível"
+        lbConsole.text = game.console?.name ?? "plataforma indisponível"
         if let image = game.cover as? UIImage {
             ivCover.image = image
         } else {

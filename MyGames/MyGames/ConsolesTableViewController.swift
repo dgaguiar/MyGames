@@ -70,4 +70,16 @@ class ConsolesTableViewController: UITableViewController {
         return cell
     }
 
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let console = consolesManager.consoles[indexPath.row]
+        showAlert(with: console)
+        tableView.deselectRow(at: indexPath, animated: false)
+    }
+    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            consolesManager.deleteConsole(index: indexPath.row, context: context)
+            tableView.deleteRows(at: [indexPath], with: .fade)
+        }
+    }
 }

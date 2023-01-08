@@ -13,11 +13,23 @@ class GamesTableViewController: UITableViewController {
     
     var fetchedResultController: NSFetchedResultsController<Game>!
     var lbEmpty = UILabel()
+    let searchController = UISearchController(searchResultsController: nil)
 
     override func viewDidLoad() {
         super.viewDidLoad()
         loadGames()
         configEmpty()
+        searchController.searchResultsUpdater = self
+        searchController.searchBar.tintColor = .white
+        searchController.searchBar.barTintColor = .white
+        navigationItem.searchController = searchController
+        
+        searchController.searchBar.delegate = self
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tableView.reloadData()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -35,11 +47,18 @@ class GamesTableViewController: UITableViewController {
         lbEmpty.tintColor = UIColor(named: "main")
     }
 
-    func loadGames() {
+    func loadGames(filtering: String = String()) {
         let fetchRequest: NSFetchRequest<Game> = Game.fetchRequest()
         // Ordena por ordem alfabética dos titles
         let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
         fetchRequest.sortDescriptors = [sortDescriptor]
+        
+        if !filtering.isEmpty {
+            // para case INsentive coloca o [c]
+            let predicate = NSPredicate(format: "title contains [c] %@", filtering)
+            fetchRequest.predicate = predicate
+        }
+        
         fetchedResultController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultController.delegate = self
         do {
@@ -74,32 +93,6 @@ class GamesTableViewController: UITableViewController {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }    
     }
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
 
 extension GamesTableViewController: NSFetchedResultsControllerDelegate {
@@ -113,5 +106,21 @@ extension GamesTableViewController: NSFetchedResultsControllerDelegate {
         default:
             tableView.reloadData()
         }
+    }
+}
+
+extension GamesTableViewController: UISearchResultsUpdating, UISearchBarDelegate {
+    func updateSearchResults(for searchController: UISearchController) {
+        //
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        loadGames()
+        tableView.reloadData()
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        loadGames(filtering: searchBar.text ?? String())
+        tableView.reloadData()
     }
 }
