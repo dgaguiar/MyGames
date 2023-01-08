@@ -28,6 +28,7 @@ class GamesTableViewController: UITableViewController {
 
     func loadGames() {
         let fetchRequest: NSFetchRequest<Game> = Game.fetchRequest()
+        // Ordena por ordem alfabética dos titles
         let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
         fetchRequest.sortDescriptors = [sortDescriptor]
         fetchedResultController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
